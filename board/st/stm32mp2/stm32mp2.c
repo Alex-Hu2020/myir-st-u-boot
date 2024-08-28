@@ -201,6 +201,41 @@ static bool reset_gpio(ofnode node)
 	return true;
 }
 
+static bool phy_reset_gpio(ofnode node)
+	{
+	struct gpio_desc reset_gpio;
+
+	gpio_request_by_name_nodev(node, "reset-gpios", 0, &reset_gpio, GPIOD_IS_OUT);
+
+	if (!dm_gpio_is_valid(&reset_gpio))
+	{
+		printf("reset gpio not valid\n");
+		return false;
+	}
+	dm_gpio_set_value(&reset_gpio, false);
+	mdelay(10);
+	dm_gpio_set_value(&reset_gpio, true);
+	mdelay(10);
+
+	dm_gpio_free(NULL, &reset_gpio);
+	return true;
+}
+static bool eth_phy_reset(void)
+{
+	ofnode node;
+	int ret;
+	node = ofnode_by_compatible(ofnode_null(), "ethernet-phy-id001c.c916");
+	if (!ofnode_valid(node))
+	{
+	        printf("node not exist\n");
+	        return false;
+	}
+
+	if (!phy_reset_gpio(node))
+		return false;
+	return true;
+}
+
 /* HELPER: search detected driver */
 struct detect_info_t {
 	bool (*detect)(void);
@@ -610,6 +645,8 @@ int board_late_init(void)
 
 	if (board_is_stm32mp257_eval())
 		board_stm32mp25x_eval_init();
+
+	eth_phy_reset();
 
 	if (board_is_stm32mp257_disco())
 		board_stm32mp25x_disco_init();
