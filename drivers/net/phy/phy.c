@@ -569,10 +569,8 @@ int phy_init(void)
 	phy_xilinx_gmii2rgmii_init();
 #endif
 #ifdef CONFIG_PHY_MOTORCOMM
-	printf("alex08-01 \n");
 	phy_motorcomm_init();
 #else
-	printf("alex08-02 \n");
 	genphy_init();
 #endif
 	return 0;
