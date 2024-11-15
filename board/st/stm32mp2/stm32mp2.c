@@ -202,37 +202,51 @@ static bool reset_gpio(ofnode node)
 }
 
 static bool phy_reset_gpio(ofnode node)
-	{
+{
 	struct gpio_desc reset_gpio;
 
 	gpio_request_by_name_nodev(node, "reset-gpios", 0, &reset_gpio, GPIOD_IS_OUT);
-
-	if (!dm_gpio_is_valid(&reset_gpio))
+	if (dm_gpio_is_valid(&reset_gpio))
 	{
-		printf("reset gpio not valid\n");
-		return false;
+		mdelay(12);
+		dm_gpio_set_value(&reset_gpio, true);  // low level
+		mdelay(12);
+		dm_gpio_set_value(&reset_gpio, false); // high level
+		// dm_gpio_free(NULL, &reset_gpio);
 	}
-	dm_gpio_set_value(&reset_gpio, false);
-	mdelay(10);
-	dm_gpio_set_value(&reset_gpio, true);
-	mdelay(10);
 
-	dm_gpio_free(NULL, &reset_gpio);
+	// other
+	gpio_request_by_name_nodev(node, "reset2-gpios", 0, &reset_gpio, GPIOD_IS_OUT);
+	if (dm_gpio_is_valid(&reset_gpio))
+	{
+		mdelay(12);
+		dm_gpio_set_value(&reset_gpio, true);  // low level
+		mdelay(12);
+		dm_gpio_set_value(&reset_gpio, false); // high level
+	}
+
 	return true;
 }
+
 static bool eth_phy_reset(void)
 {
 	ofnode node;
 	int ret;
-	node = ofnode_by_compatible(ofnode_null(), "ethernet-phy-id001c.c916");
+	node = ofnode_by_compatible(ofnode_null(), "ethernet-phy1");
 	if (!ofnode_valid(node))
 	{
-	        printf("node not exist\n");
-	        return false;
+		printf("phy node not exist\n");
+	}else{
+		phy_reset_gpio(node);
 	}
 
-	if (!phy_reset_gpio(node))
-		return false;
+	node = ofnode_by_compatible(ofnode_null(), "ethernet-phy2");
+	if (!ofnode_valid(node))
+	{
+		printf("phy node not exist\n");
+	}else{
+		phy_reset_gpio(node);
+	}
 	return true;
 }
 
