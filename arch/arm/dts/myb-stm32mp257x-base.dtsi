@@ -283,7 +283,7 @@
 };
 
 &eth2 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-0 = <&eth2_rgmii_pins_a>;
 	pinctrl-1 = <&eth2_rgmii_sleep_pins_a>;
 	pinctrl-names = "default", "sleep";
@@ -298,7 +298,7 @@
 		compatible = "snps,dwmac-mdio";
 		phy1_eth2: ethernet-phy@5 {
 				compatible = "ethernet-phy-id001c.c916","ethernet-phy2";
-				reset-gpios =  <&gpiob 2 GPIO_ACTIVE_LOW>;
+				//reset-gpios =  <&gpiob 2 GPIO_ACTIVE_LOW>;
 				reset-assert-us = <10000>;
 				reset-deassert-us = <10000>;
 				reg = <5>;
